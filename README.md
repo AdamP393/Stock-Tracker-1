@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Top 10 Rising Stocks</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #eef2f7;
+    }
+  </style>
+</head>
+<body>
+  <h1>Top 10 Rising U.S. Stocks Today</h1>
+  <p style="text-align:center;">Auto-refreshes every 5 minutes</p>
+  <table id="stockTable">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Name</th>
+        <th>Price (USD)</th>
+        <th>% Change</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const apiKey = '3643409af74749f4bc23b03a6968741a'; // Your actual TwelveData API key
+
+    async function fetchTopGainers() {
+      try {
+        const response = await fetch(`https://api.twelvedata.com/stocks?country=United%20States&apikey=${apiKey}`);
+        const data = await response.json();
+
+        if (!data || !data.data) return;
+
+        const sorted = data.data
+          .filter(stock => stock.percent_change)
+          .sort((a, b) => parseFloat(b.percent_change) - parseFloat(a.percent_change))
+          .slice(0, 10);
+
+        const tbody = document.querySelector('#stockTable tbody');
+        tbody.innerHTML = '';
+
+        sorted.forEach(stock => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${stock.symbol}</td>
+            <td>${stock.name}</td>
+            <td>$${parseFloat(stock.price).toFixed(2)}</td>
+            <td>${parseFloat(stock.percent_change).toFixed(2)}%</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    }
+
+    fetchTopGainers();
+    setInterval(fetchTopGainers, 5 * 60 * 1000); // Every 5 minutes
+  </script>
+</body>
+</html>
+# Stock-Tracker-1
